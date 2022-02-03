@@ -1,4 +1,5 @@
 const sectionItems = document.querySelector('.items');
+const cartItems = document.querySelector('.cart__items');
 
 // link para imagem melhor 
 // https://http2.mlstatic.com/D_NQ_NP_ [ 877740-MLB46839461389_072021] -O.webp
@@ -18,6 +19,32 @@ function createCustomElement(element, className, innerText) {
   return e;
 }
 
+function getSkuFromProductItem(item) {
+  return item.querySelector('span.item__sku').innerText;
+}
+
+// remove o item do carrinho
+function cartItemClickListener(event) {
+  event.target.parentElement.removeChild(event.target);
+}
+
+function createCartItemElement({ sku, name, salePrice }) {
+  const li = document.createElement('li');
+  li.className = 'cart__item';
+  li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
+  li.addEventListener('click', cartItemClickListener);
+  return li;
+}
+
+// coloca o item no carrinho
+const addCartShopping = async (event) => {
+  const id = getSkuFromProductItem(event.target.parentElement);
+  const data = await fetchItem(id);
+  const param = { sku: id, name: data.title, salePrice: data.price };
+  const result = createCartItemElement(param);
+  cartItems.appendChild(result);
+};
+
 function createProductItemElement({ sku, name, image }) {
   const section = document.createElement('section');
   section.className = 'item';
@@ -26,33 +53,19 @@ function createProductItemElement({ sku, name, image }) {
   section.appendChild(createProductImageElement(image));
   section.appendChild(createCustomElement('span', 'item__title', name));
   section.appendChild(createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'));
-
   return section;
 }
 
-/* function getSkuFromProductItem(item) {
-  return item.querySelector('span.item__sku').innerText;
-} */
-
-/* function cartItemClickListener(event) {
-  // coloque seu código aqui
-} */
-
-/* function createCartItemElement({ sku, name, salePrice }) {
-  const li = document.createElement('li');
-  li.className = 'cart__item';
-  li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
-  li.addEventListener('click', cartItemClickListener);
-  return li;
-} */
-
+// chama todos elementos pesquisados na página e adiciona o event
 const appendSectionItem = async (product) => {
   const data = await fetchProducts(product);
-  console.log(data);
   data.forEach((element) => {
   const param = { sku: element.id, name: element.title, image: element.thumbnail };
   const results = createProductItemElement(param);
   sectionItems.appendChild(results);
   });
+  const btn = document.querySelectorAll('.item__add');
+  btn.forEach((element) => element.addEventListener('click', addCartShopping));
 };
+
 window.onload = () => { appendSectionItem('computador'); };
