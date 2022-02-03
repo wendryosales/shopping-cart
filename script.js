@@ -59,7 +59,7 @@ function createProductItemElement({ sku, name, image }) {
 // chama todos elementos pesquisados na página e adiciona o event
 const appendSectionItem = async (product) => {
   const data = await fetchProducts(product);
-  data.forEach((element) => {
+  data.results.forEach((element) => {
   const param = { sku: element.id, name: element.title, image: element.thumbnail };
   const results = createProductItemElement(param);
   sectionItems.appendChild(results);
