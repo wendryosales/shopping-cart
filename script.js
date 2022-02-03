@@ -9,7 +9,7 @@ const sectionCart = document.querySelector('.cart');
 // salva o item do carrinho no local storage
 
 const uptLocalStorage = () => {
-  const products = sectionCart.firstElementChild.innerText;
+  const products = sectionCart.firstElementChild.innerHTML;
   saveCartItems(products);
 };
 
@@ -78,6 +78,16 @@ const appendSectionItem = async (product) => {
   btn.forEach((element) => element.addEventListener('click', addCartShopping));
 };
 
+function loadItems() {
+  const productsOnCart = getSavedCartItems();
+  cartItems.innerHTML = productsOnCart;
+  const liChildren = document.querySelectorAll('.cart__item');
+  liChildren.forEach((element) => {
+    element.addEventListener('click', cartItemClickListener);
+  });
+}
+
 window.onload = () => { 
   appendSectionItem('computador');
+  loadItems();
  };
