@@ -89,5 +89,6 @@ function loadItems() {
 
 window.onload = () => { 
   appendSectionItem('computador');
+  getSavedCartItems();
   loadItems();
  };
