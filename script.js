@@ -1,6 +1,7 @@
 const sectionItems = document.querySelector('.items');
 const cartItems = document.querySelector('.cart__items');
 const sectionCart = document.querySelector('.cart');
+const price = document.querySelector('.total-price');
 
 // link para imagem melhor 
 // https://http2.mlstatic.com/D_NQ_NP_ [ 877740-MLB46839461389_072021] -O.webp
@@ -19,10 +20,8 @@ const sumTotalAmount = () => {
   });
   return result/* .toFixed(2) */;
 };
-
 const uptTotalCheck = () => {
-  const element = document.querySelector('.total-price');
-  element.innerHTML = sumTotalAmount();
+  price.innerHTML = sumTotalAmount();
 };
 
 // save the item of cart in local storage
@@ -109,8 +108,36 @@ function loadItems() {
   uptTotalCheck();
 }
 
-window.onload = () => { 
-  appendSectionItem('computador');
+const removeAllItemsCart = () => {
+  cartItems.innerHTML = '';
+  uptTotalCheck();
+};
+
+function eventRemoveItemsCart() {
+  const btn = document.querySelector('.empty-cart');
+  btn.addEventListener('click', removeAllItemsCart);
+}
+
+const removeLoadScreen = () => {
+  sectionItems.innerHTML = '';
+};
+
+const loadScreen = () => {
+  setTimeout(() => {
+    removeLoadScreen();
+    appendSectionItem('computador');
+  }, 2000);
+};
+
+const addloadScreen = () => {
+  const load = createCustomElement('div', 'loading', 'carregando...');
+  sectionItems.appendChild(load);
+};
+
+window.onload = () => {
+  addloadScreen();
+  loadScreen();
   getSavedCartItems();
   loadItems();
+  eventRemoveItemsCart();
  };
