@@ -13,7 +13,7 @@ Carrinho de compras com manipulação do DOM em JavaScript Vanilla. O consumo de
 
 ## Demonstração
 
--[Preview]()
+-[Preview](https://shopping-cartw.netlify.app/)
 
 ## Author
 
