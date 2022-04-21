@@ -2,10 +2,7 @@ const sectionItems = document.querySelector('.items');
 const cartItems = document.querySelector('.cart__items');
 const sectionCart = document.querySelector('.cart');
 const price = document.querySelector('.total-price');
-
-// link para imagem melhor 
-// https://http2.mlstatic.com/D_NQ_NP_ [ 877740-MLB46839461389_072021] -O.webp
-// [ thumnail id ]
+const inputSearch = document.querySelector('.search');
 
 // sum of items in cart
 const sumTotalAmount = () => {
@@ -18,10 +15,10 @@ const sumTotalAmount = () => {
     const valueNumber = Number(captureValue);
     result += valueNumber;
   });
-  return result/* .toFixed(2) */;
+  return result.toFixed(2);
 };
 const uptTotalCheck = () => {
-  price.innerHTML = sumTotalAmount();
+  price.innerHTML = `Valor Total: R$ ${sumTotalAmount()}`;
 };
 
 // save the item of cart in local storage
@@ -56,10 +53,13 @@ function cartItemClickListener(event) {
   uptTotalCheck();
 }
 
-function createCartItemElement({ sku, name, salePrice }) {
+function createCartItemElement({ sku, name, salePrice, image }) {
   const li = document.createElement('li');
   li.className = 'cart__item';
-  li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
+  li.innerText = `${name}
+
+  R$${salePrice}`;
+  li.appendChild(createProductImageElement(image));
   li.addEventListener('click', cartItemClickListener);
   return li;
 }
@@ -68,21 +68,23 @@ function createCartItemElement({ sku, name, salePrice }) {
 const addCartShopping = async (event) => {
   const id = getSkuFromProductItem(event.target.parentElement);
   const data = await fetchItem(id);
-  const param = { sku: id, name: data.title, salePrice: data.price };
+  const param = { sku: id, name: data.title, salePrice: data.price, image: data.secure_thumbnail };
   const result = createCartItemElement(param);
   cartItems.appendChild(result);
   uptLocalStorage();
   uptTotalCheck();
 };
 
-function createProductItemElement({ sku, name, image }) {
+function createProductItemElement({ sku, name, image, prices }) {
   const section = document.createElement('section');
   section.className = 'item';
 
   section.appendChild(createCustomElement('span', 'item__sku', sku));
   section.appendChild(createProductImageElement(image));
   section.appendChild(createCustomElement('span', 'item__title', name));
-  section.appendChild(createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'));
+  section.appendChild(createCustomElement('span', 'item__price', `R$${prices}`));
+  const classe = 'item__add effect effect2';
+  section.appendChild(createCustomElement('button', classe, 'Adicionar ao carrinho!'));
   return section;
 }
 
@@ -90,7 +92,9 @@ function createProductItemElement({ sku, name, image }) {
 const appendSectionItem = async (product) => {
   const data = await fetchProducts(product);
   data.results.forEach((element) => {
-  const param = { sku: element.id, name: element.title, image: element.thumbnail };
+  const img = `https://http2.mlstatic.com/D_NQ_NP_${element.thumbnail_id}-O.webp`;
+  const priceSale = element.price.toFixed(2);
+  const param = { sku: element.id, name: element.title, image: img, prices: priceSale };
   const results = createProductItemElement(param);
   sectionItems.appendChild(results);
   });
@@ -111,6 +115,7 @@ function loadItems() {
 const removeAllItemsCart = () => {
   cartItems.innerHTML = '';
   uptTotalCheck();
+  uptLocalStorage();
 };
 
 function eventRemoveItemsCart() {
@@ -123,15 +128,43 @@ const removeLoadScreen = () => {
 };
 
 const loadScreen = () => {
+  const valueSearch = localStorage.getItem('search');
   setTimeout(() => {
     removeLoadScreen();
-    appendSectionItem('computador');
-  }, 2000);
+    if (valueSearch === null) {
+      appendSectionItem('computador');
+    } appendSectionItem(valueSearch);
+  }, 1000);
 };
 
 const addloadScreen = () => {
   const load = createCustomElement('div', 'loading', 'carregando...');
   sectionItems.appendChild(load);
+};
+
+const searchItem = () => {
+  localStorage.setItem('search', inputSearch.value);
+  removeLoadScreen();
+  appendSectionItem(inputSearch.value);
+  inputSearch.value = '';
+};
+
+// keycode do enter é o 13
+
+const seachItemWithEnter = (event) => {
+  const key = event.keyCode;
+  if (key === 13) {
+    localStorage.setItem('search', inputSearch.value);
+    removeLoadScreen();
+    appendSectionItem(inputSearch.value);
+    inputSearch.value = '';
+  }
+};
+
+const loadEventSearch = () => {
+  const icon = document.querySelector('.search-icon');
+  icon.addEventListener('click', searchItem);
+  inputSearch.addEventListener('keyup', seachItemWithEnter);
 };
 
 window.onload = () => {
@@ -140,4 +173,5 @@ window.onload = () => {
   getSavedCartItems();
   loadItems();
   eventRemoveItemsCart();
+  loadEventSearch();
  };
